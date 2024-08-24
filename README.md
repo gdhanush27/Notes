@@ -1,4 +1,13 @@
 <!-- git and github steps -->
+## ML model creation 
+
+- Collect data
+- Create a model using `sklearn` and save it using `pickle`
+- Create a `streamlit` app to run the model
+- Upload the app to `GitHub`
+- Create an account on `streamlit`
+- Deploy the app on `streamlit`
+<!-- https://sentiment-analys.streamlit.app/ -->
 
 ## Git and GitHub Steps
 
