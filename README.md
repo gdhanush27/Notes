@@ -1,3 +1,5 @@
+# Overview
+
 <!-- Create and deploy ML project -->
 ## ML model creation 
 
@@ -18,3 +20,12 @@
 - `git remote add origin <remote repository URL>` - Add a remote repository
 - `git remote -v` - Verify remote repository
 - `git push -u origin master` - Push changes to remote repository
+
+# Sentiment Analysis
+
+- This is a simple project to demonstrate the deployment of a machine learning model using `streamlit` and `GitHub`.
+- The model is trained on the `Reddit` dataset to classify the sentiment of a movie review as positive, negative and negative.
+- The model is trained using `sklearn` and saved using `pickle`.
+- The model is a `Logistic Regression` model.
+- Accuracy of the model is `0.89`.
+- The model is deployed on `streamlit` and can be accessed [here](https://sentiment-analys.streamlit.app/).
