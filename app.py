@@ -15,7 +15,18 @@ class SentimentClassifier:
         return SentimentClassifier.model_prediction[y[0]]
 model = SentimentClassifier('sentiment_model.pkl')
 def main():
-    st.title("Sentiment Analysis App")
+    st.set_page_config(page_title="Sentiment Analysis", page_icon="🧊")
+
+    # st.markdown(
+    #     r"""
+    #     <style>
+    #         .stAppDeployButton {display:none;}
+    #     </style>
+    #     """,
+    #     unsafe_allow_html=True,
+    # )
+    st.header("Sentiment Analysis")
+    
     user_input = st.text_area("Enter your text here:")
     if st.button("Analyze"):
         if user_input:
