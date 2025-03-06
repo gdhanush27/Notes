@@ -7,9 +7,9 @@ A collection of tools and learning resources for:
 ---
 
 ## Quick Navigation
-
+<!-- add accenture notes -->
 | Project               | Description                                  | Direct Links                          |
 |-----------------------|----------------------------------------------|---------------------------------------|
 | **Sentiment Analysis**| Real-time text sentiment classification app | [Code](./Flask-Tutorial/app.py)<br>[Docs](./Flask-Tutorial/README.md) |
 | **SQL Guide**         | Database fundamentals & best practices      | [Basics](./SQL-Notes/README.md)<br>[Normalization](./SQL-Notes/Normalization.md)<br>[Best Practices](./SQL-Notes/SQL_Best_Practices.md) |
-
+| **Accenture Notes**   | Notes for Accenture| [Quantitative](Accenture-Questions\Quans.md)<br>[Previous Questions](Accenture-Questions\Questions.md) |
