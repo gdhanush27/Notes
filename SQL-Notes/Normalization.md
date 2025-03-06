@@ -258,5 +258,3 @@ CREATE TABLE ProjectSupplier (
 - Normalization reduces redundancy and improves data integrity.  
 - Over-normalization can lead to performance issues (too many joins).  
 - BCNF and 3NF are widely used; 4NF/5NF are niche for complex scenarios.  
-
-Let me know if you need deeper dives or real-world use cases! 😊
