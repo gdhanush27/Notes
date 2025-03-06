@@ -1,0 +1,3 @@
+Quantitative Aptitude
+Question: If a car travels 420 km in 7 hours, what is its average speed? Answer: 60 km/hour (420 km ÷ 7 hours = 60 km/hour)
+Question: What is 15% of 80? Answer: 12 (15% of 80 = 0.15 × 80 = 12)

@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Google tag (gtag.js) -->
+    <style>
+      html {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: #999999;
+  font-family: "Varela", sans-serif;
+  height: calc(100%);
+  overflow: auto;
+  position: relative;
+}
+
+#tsparticles {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: -1;
+}
+.images {
+  text-align: center;
+  width: 50%;
+  height: auto;
+  margin-top: 20%;
+  opacity: 80%;
+}
+#cup {
+  width: 125px;
+  height: auto;
+  margin-bottom: 5%;
+}
+
+#cat {
+  width: 300px;
+  height: auto;
+}
+.para {
+  text-align: center;
+  width: 50%;
+  height: auto;
+}
+h2 {
+  font-size: 100px;
+  opacity: 40%;
+}
+
+h3 {
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  font-size: 40px;
+  opacity: 60%;
+}
+p {
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  font-size: 24px;
+}
+
+button {
+  opacity: 50%;
+  font-size: 17px;
+  background-color: #cccccc;
+  padding: 3%;
+  margin-top: 5%;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+}
+
+    </style>
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-1752YPLP7H"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-1752YPLP7H");
+    </script>
+
+    <title>Snowfall | tsParticles 404</title>
+    <link rel="stylesheet" href="css/app.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Varela"
+    />
+    <link rel="icon" type="image/x-icon" href="../images/tsParticles-64.png" />
+  </head>
+  <body>
+    <div id="tsparticles"></div>
+    <div style="display: inline-flex">
+      <div class="images">
+        <img id="cup" src="images/cup.svg" />
+        <img id="cat" src="images/cat.svg" />
+      </div>
+      <div class="para">
+        <header>
+          <h2>404.</h2>
+          <h3>Sorry, Wrong Door.</h3>
+        </header>
+
+        <p>
+          Don't worry, sometimes even we make mistakes. You can find plenty of
+          other things on our homepage.
+        </p>
+
+        <button>Back to Homepage</button>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+  <script>
+    tsParticles.load("tsparticles", {
+  particles: {
+    number: {
+      value: 350,
+      density: {
+        enable: true,
+        value_area: 600,
+      },
+    },
+    color: {
+      value: "#ffffff",
+    },
+    shape: {
+      type: "image",
+      stroke: {
+        width: 2,
+        color: "#fff",
+      },
+      polygon: {
+        nb_sides: 6,
+      },
+      image: {
+        src: "images/starburst_white_300_drop_2.png",
+        width: 10,
+        height: 10,
+      },
+    },
+    opacity: {
+      value: 0.5,
+      random: false,
+      anim: {
+        enable: false,
+        speed: 2,
+        opacity_min: 0.2,
+        sync: false,
+      },
+    },
+    size: {
+      value: 5,
+      random: true,
+      anim: {
+        enable: false,
+        speed: 20,
+        size_min: 0.1,
+        sync: false,
+      },
+    },
+    line_linked: {
+      enable: false,
+      distance: 50,
+      color: "#ffffff",
+      opacity: 0.5,
+      width: 1,
+    },
+    move: {
+      enable: true,
+      speed: { min: 1, max: 3 },
+      direction: "bottom",
+      straight: false,
+      out_mode: "out",
+      bounce: false,
+    },
+  },
+  interactivity: {
+    detect_on: "canvas",
+    events: {
+      onhover: {
+        enable: true,
+        mode: "bubble",
+      },
+      onclick: {
+        enable: true,
+        mode: "repulse",
+      },
+      resize: true,
+    },
+    modes: {
+      grab: {
+        distance: 125,
+        line_linked: {
+          opacity: 1,
+        },
+      },
+      bubble: {
+        distance: 200,
+        size: 33,
+        duration: 2,
+        opacity: 6,
+        speed: 2,
+      },
+      repulse: {
+        distance: 200,
+        duration: 0.25,
+      },
+      push: {
+        particles_nb: 4,
+      },
+      remove: {
+        particles_nb: 2,
+      },
+    },
+  },
+  retina_detect: true,
+});
+
+  </script>
+</html>
