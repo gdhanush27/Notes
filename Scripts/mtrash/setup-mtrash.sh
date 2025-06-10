@@ -3,7 +3,7 @@
 
 # Default values
 DEFAULT_TRASH_DIR="$HOME/.trash"
-DEFAULT_MAX_SIZE_MB=1024
+DEFAULT_MAX_SIZE_MB=2048
 BIN_DIR="$HOME/.local/bin"
 TEMP_DIR=$(mktemp -d)
 
