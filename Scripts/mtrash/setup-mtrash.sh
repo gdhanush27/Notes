@@ -2,8 +2,8 @@
 # setup-mtrash.sh: Setup script for mtrash and safe-rm CLI trash system
 
 # Default values
-DEFAULT_TRASH_DIR="$HOME/.trash"
-DEFAULT_MAX_SIZE_MB=2048
+TRASH_DIR="$HOME/.trash"
+MAX_SIZE_MB=2048
 BIN_DIR="$HOME/.local/bin"
 TEMP_DIR=$(mktemp -d)
 
@@ -41,12 +41,6 @@ echo "✅ Successfully downloaded source files from GitHub:"
 echo "   - safe-rm"
 echo "   - mtrash"
 echo
-
-# Prompt for trash dir and max size
-read -rp "Enter trash directory [$DEFAULT_TRASH_DIR]: " TRASH_DIR
-TRASH_DIR="${TRASH_DIR:-$DEFAULT_TRASH_DIR}"
-read -rp "Enter max trash size in MB [$DEFAULT_MAX_SIZE_MB]: " MAX_SIZE_MB
-MAX_SIZE_MB="${MAX_SIZE_MB:-$DEFAULT_MAX_SIZE_MB}"
 
 # Ensure bin dir exists
 mkdir -p "$BIN_DIR"
