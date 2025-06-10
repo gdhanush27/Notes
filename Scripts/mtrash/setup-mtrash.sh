@@ -5,25 +5,42 @@
 DEFAULT_TRASH_DIR="$HOME/.trash"
 DEFAULT_MAX_SIZE_MB=1024
 BIN_DIR="$HOME/.local/bin"
+TEMP_DIR=$(mktemp -d)
 
-# Check for source files
-SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
-SAFE_RM_SOURCE="$SCRIPT_DIR/safe-rm"
-MTRASH_SOURCE="$SCRIPT_DIR/mtrash"
+# GitHub repository URLs
+GITHUB_SAFE_RM_URL="https://raw.githubusercontent.com/gdhanush27/Notes/main/Scripts/mtrash/safe-rm"
+GITHUB_MTRASH_URL="https://raw.githubusercontent.com/gdhanush27/Notes/main/Scripts/mtrash/mtrash"
 
-if [ ! -f "$SAFE_RM_SOURCE" ]; then
-    echo "❌ Error: safe-rm source file not found at $SAFE_RM_SOURCE"
+# Download latest versions from GitHub
+echo "📥 Downloading latest versions from GitHub..."
+if command -v curl &> /dev/null; then
+    curl -s -o "$TEMP_DIR/safe-rm" "$GITHUB_SAFE_RM_URL"
+    curl -s -o "$TEMP_DIR/mtrash" "$GITHUB_MTRASH_URL"
+elif command -v wget &> /dev/null; then
+    wget -q -O "$TEMP_DIR/safe-rm" "$GITHUB_SAFE_RM_URL"
+    wget -q -O "$TEMP_DIR/mtrash" "$GITHUB_MTRASH_URL"
+else
+    echo "❌ Error: Neither curl nor wget found. Please install one of them."
+    rm -rf "$TEMP_DIR"
     exit 1
 fi
 
-if [ ! -f "$MTRASH_SOURCE" ]; then
-    echo "❌ Error: mtrash source file not found at $MTRASH_SOURCE"
+# Check if downloads were successful
+if [ ! -s "$TEMP_DIR/safe-rm" ]; then
+    echo "❌ Error: Failed to download safe-rm from GitHub"
+    rm -rf "$TEMP_DIR"
     exit 1
 fi
 
-echo "✅ Found source files:"
-echo "   - safe-rm: $SAFE_RM_SOURCE"
-echo "   - mtrash: $MTRASH_SOURCE"
+if [ ! -s "$TEMP_DIR/mtrash" ]; then
+    echo "❌ Error: Failed to download mtrash from GitHub"
+    rm -rf "$TEMP_DIR"
+    exit 1
+fi
+
+echo "✅ Successfully downloaded source files from GitHub:"
+echo "   - safe-rm"
+echo "   - mtrash"
 echo
 
 # Prompt for trash dir and max size
@@ -38,13 +55,13 @@ echo "✅ Created bin directory: $BIN_DIR"
 
 # Update and install safe-rm
 echo "📦 Installing safe-rm..."
-sed "s|^TRASH_DIR=.*|TRASH_DIR=\"$TRASH_DIR\"|; s|^MAX_SIZE_MB=.*|MAX_SIZE_MB=$MAX_SIZE_MB|" "$SAFE_RM_SOURCE" > "$BIN_DIR/safe-rm"
+sed "s|^TRASH_DIR=.*|TRASH_DIR=\"$TRASH_DIR\"|; s|^MAX_SIZE_MB=.*|MAX_SIZE_MB=$MAX_SIZE_MB|" "$TEMP_DIR/safe-rm" > "$BIN_DIR/safe-rm"
 chmod +x "$BIN_DIR/safe-rm"
 echo "✅ Installed safe-rm to $BIN_DIR/safe-rm"
 
 # Update and install mtrash
 echo "📦 Installing mtrash..."
-sed "s|^TRASH_DIR=.*|TRASH_DIR=\"$TRASH_DIR\"|" "$MTRASH_SOURCE" > "$BIN_DIR/mtrash"
+sed "s|^TRASH_DIR=.*|TRASH_DIR=\"$TRASH_DIR\"|" "$TEMP_DIR/mtrash" > "$BIN_DIR/mtrash"
 chmod +x "$BIN_DIR/mtrash"
 echo "✅ Installed mtrash to $BIN_DIR/mtrash"
 
@@ -56,6 +73,9 @@ if ! echo "$PATH" | grep -q "$BIN_DIR"; then
     echo "export PATH=\"$BIN_DIR:\$PATH\"" >> "$HOME/.bashrc"
     echo "Added $BIN_DIR to PATH in ~/.bashrc. Please restart your shell."
 fi
+
+# Clean up temp directory
+rm -rf "$TEMP_DIR"
 
 echo "✅ mtrash and safe-rm installed to $BIN_DIR."
 echo "Trash directory: $TRASH_DIR (max $MAX_SIZE_MB MB)"
