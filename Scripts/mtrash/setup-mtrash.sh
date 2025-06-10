@@ -7,7 +7,6 @@ DEFAULT_MAX_SIZE_MB=1024
 BIN_DIR="$HOME/.local/bin"
 TEMP_DIR=$(mktemp -d)
 
-# GitHub repository URLs
 GITHUB_SAFE_RM_URL="https://raw.githubusercontent.com/gdhanush27/Notes/main/Scripts/mtrash/safe-rm"
 GITHUB_MTRASH_URL="https://raw.githubusercontent.com/gdhanush27/Notes/main/Scripts/mtrash/mtrash"
 
