@@ -66,16 +66,26 @@ echo "✅ Installed mtrash to $BIN_DIR/mtrash"
 
 # Create trash directory structure
 mkdir -p "$TRASH_DIR/files" "$TRASH_DIR/info"
+echo "✅ Created trash directory structure: $TRASH_DIR"
 
 # Add bin dir to PATH if not present
 if ! echo "$PATH" | grep -q "$BIN_DIR"; then
     echo "export PATH=\"$BIN_DIR:\$PATH\"" >> "$HOME/.bashrc"
-    echo "Added $BIN_DIR to PATH in ~/.bashrc. Please restart your shell."
+    echo "✅ Added $BIN_DIR to PATH in ~/.bashrc. Please restart your shell or run: source ~/.bashrc"
+else
+    echo "✅ $BIN_DIR already in PATH"
 fi
 
 # Clean up temp directory
 rm -rf "$TEMP_DIR"
 
-echo "✅ mtrash and safe-rm installed to $BIN_DIR."
-echo "Trash directory: $TRASH_DIR (max $MAX_SIZE_MB MB)"
-echo "You can now use 'safe-rm' and 'mtrash' from the CLI."
+echo ""
+echo "🎉 Installation Complete!"
+echo "✅ mtrash and safe-rm installed to $BIN_DIR"
+echo "✅ Trash directory: $TRASH_DIR (max ${MAX_SIZE_MB}MB)"
+echo "✅ You can now use 'safe-rm' and 'mtrash' from the CLI"
+echo ""
+echo "Quick start:"
+echo "  safe-rm file.txt        # Move file to trash"
+echo "  mtrash -v               # View trash contents"
+echo "  mtrash -r filename      # Restore file from trash"
