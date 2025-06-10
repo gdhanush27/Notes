@@ -1,0 +1,39 @@
+#!/bin/bash
+
+TRASH_DIR="/mnt/d/.trash"
+TRASH_FILES="$TRASH_DIR/files"
+TRASH_INFO="$TRASH_DIR/info"
+
+mkdir -p "$TRASH_FILES" "$TRASH_INFO"
+
+MAX_SIZE_MB=1024
+current_size=$(du -sm "$TRASH_DIR" | cut -f1)
+
+if [ "$current_size" -gt "$MAX_SIZE_MB" ]; then
+    echo "⚠️ Trash exceeds ${MAX_SIZE_MB}MB"
+    echo "1: Delete >1 month | 2: >3 months | 3: >6 months | 4: Cancel"
+    read -rp "Choice: " choice
+    case $choice in
+        1) find "$TRASH_FILES" -mtime +30 -exec rm -rf {} \; ;;
+        2) find "$TRASH_FILES" -mtime +90 -exec rm -rf {} \; ;;
+        3) find "$TRASH_FILES" -mtime +180 -exec rm -rf {} \; ;;
+        *) echo "Cancelled"; exit 1 ;;
+    esac
+fi
+
+for item in "$@"; do
+    [ ! -e "$item" ] && echo "❌ $item not found" && continue
+
+    base=$(basename "$item")
+    ts=$(date +%Y%m%d_%H%M%S)
+    name="${base}_$ts"
+
+    dest="$TRASH_FILES/$name"
+    mv "$item" "$dest"
+
+    echo "[Trash Info]" > "$TRASH_INFO/$name.trashinfo"
+    echo "Path=$(realpath "$item")" >> "$TRASH_INFO/$name.trashinfo"
+    echo "DeletionDate=$(date +%Y-%m-%dT%H:%M:%S)" >> "$TRASH_INFO/$name.trashinfo"
+
+    echo "🗑️ Moved: $item → $dest"
+done

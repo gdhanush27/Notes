@@ -1,0 +1,125 @@
+#!/bin/bash
+
+TRASH_DIR="/mnt/d/.trash"
+TRASH_FILES="$TRASH_DIR/files"
+TRASH_INFO="$TRASH_DIR/info"
+mkdir -p "$TRASH_FILES" "$TRASH_INFO"
+shopt -s nullglob
+
+# View trash tree
+view_trash() {
+    echo "📁 Trash Contents:"
+    echo
+    for file in "$TRASH_INFO"/*.trashinfo; do
+        name=$(basename "$file" .trashinfo)
+        orig=$(grep "^Path=" "$file" | cut -d= -f2-)
+        del_date=$(grep "^DeletionDate=" "$file" | cut -d= -f2-)
+        echo "• $name"
+        echo "   ├─ Original: $orig"
+        echo "   └─ Deleted:  $del_date"
+    done
+}
+
+# Restore matching items
+restore_trash() {
+    keyword="$1"
+    matches=()
+    declare -A name_to_path
+    i=0
+
+    for info in "$TRASH_INFO"/*.trashinfo; do
+        name=$(basename "$info" .trashinfo)
+        orig=$(grep "^Path=" "$info" | cut -d= -f2-)
+        if [[ "$name" == *"$keyword"* || "$orig" == *"$keyword"* ]]; then
+            matches+=("$name")
+            name_to_path["$name"]="$orig"
+            echo "[$i] $name → $orig"
+            ((i++))
+        fi
+    done
+
+    if [ ${#matches[@]} -eq 0 ]; then echo "❌ No matches."; return; fi
+
+    echo
+    read -rp "Restore index (comma-separated or 'all'): " sel
+    restore_list=()
+
+    if [[ "$sel" == "all" ]]; then
+        restore_list=("${matches[@]}")
+    else
+        IFS=',' read -ra ids <<< "$sel"
+        for idx in "${ids[@]}"; do
+            if [[ "$idx" =~ ^[0-9]+$ ]] && [ "$idx" -lt "${#matches[@]}" ]; then
+                restore_list+=("${matches[$idx]}")
+            fi
+        done
+    fi
+
+    for name in "${restore_list[@]}"; do
+        src="$TRASH_FILES/$name"
+        dst="${name_to_path[$name]}"
+        info="$TRASH_INFO/$name.trashinfo"
+        mkdir -p "$(dirname "$dst")"
+        mv "$src" "$dst" && rm -f "$info"
+        echo "✅ Restored: $dst"
+    done
+}
+
+# Delete matching items
+delete_trash() {
+    keyword="$1"
+    matches=()
+    declare -A name_to_path
+    i=0
+
+    for info in "$TRASH_INFO"/*.trashinfo; do
+        name=$(basename "$info" .trashinfo)
+        orig=$(grep "^Path=" "$info" | cut -d= -f2-)
+        if [[ "$name" == *"$keyword"* || "$orig" == *"$keyword"* ]]; then
+            matches+=("$name")
+            name_to_path["$name"]="$orig"
+            echo "[$i] $name → $orig"
+            ((i++))
+        fi
+    done
+
+    if [ ${#matches[@]} -eq 0 ]; then echo "❌ No matches."; return; fi
+
+    echo
+    read -rp "Delete index (comma-separated or 'all'): " sel
+    del_list=()
+
+    if [[ "$sel" == "all" ]]; then
+        del_list=("${matches[@]}")
+    else
+        IFS=',' read -ra ids <<< "$sel"
+        for idx in "${ids[@]}"; do
+            if [[ "$idx" =~ ^[0-9]+$ ]] && [ "$idx" -lt "${#matches[@]}" ]; then
+                del_list+=("${matches[$idx]}")
+            fi
+        done
+    fi
+
+    for name in "${del_list[@]}"; do
+        rm -rf "$TRASH_FILES/$name" "$TRASH_INFO/$name.trashinfo"
+        echo "❌ Deleted: $name"
+    done
+}
+
+# Help
+usage() {
+    echo "📦 mtrash - CLI Trash Manager"
+    echo
+    echo "Usage:"
+    echo "  mtrash -v                     View trash contents (tree format)"
+    echo "  mtrash -r <name>              Restore file/folder by keyword"
+    echo "  mtrash -d <name>              Delete file/folder from trash"
+}
+
+# Entry point
+case "$1" in
+    -v|--view) view_trash ;;
+    -r|--restore) [ -n "$2" ] && restore_trash "$2" || echo "❌ Missing keyword." ;;
+    -d|--delete) [ -n "$2" ] && delete_trash "$2" || echo "❌ Missing keyword." ;;
+    -h|--help|*) usage ;;
+esac
