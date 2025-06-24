@@ -14,6 +14,7 @@
 - Switch - breaks only collision domain
 - Router - breaks both domain
 - If there are n devices connected on a
+
 | devices | Broadcast domain | Collision Domain |
 |--------|--------|--------|
 | Hub | 1 | 1 |
