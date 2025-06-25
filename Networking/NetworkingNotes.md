@@ -170,7 +170,7 @@
     → Host range: 192.168.1.129 – 192.168.1.190
 
 
-#### 📌 Final Summary Table (All in terms of `/n`)
+### Final Summary Table (All in terms of `/n`)
 
 | What You Want     | Formula / Logic                            |
 | ----------------- | ------------------------------------------ |
