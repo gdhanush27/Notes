@@ -64,110 +64,110 @@
 
 ### Formule in subnets
 
-#### 🔹 **1. Number of Subnets**
+1. **Number of Subnets**
 
-**🧾 Formula:**  
-Number of Subnets = 2^(n - original prefix)
+    **🧾 Formula:**  
+    Number of Subnets = 2^(n - original prefix)
 
-**📌 Explanation:**
-- `n` = new CIDR (e.g., /26)  
-- `original prefix` = starting network CIDR (e.g., /24)  
-- You are **borrowing** bits from the host portion to create subnets.
+    **📌 Explanation:**
+    - `n` = new CIDR (e.g., /26)  
+    - `original prefix` = starting network CIDR (e.g., /24)  
+    - You are **borrowing** bits from the host portion to create subnets.
 
-**✅ Example:**  
-From /24 to /26 → Borrowed bits = 26 - 24 = 2 → Subnets = 2^2 = 4
-
-
-#### 🔹 **2. Usable Hosts per Subnet**
-
-**🧾 Formula:**  
-Usable Hosts = 2^(32 - n) - 2
-
-**📌 Explanation:**
-- `n` = CIDR  
-- `32 - n` = number of host bits
-
-**✅ Example:**  
-For /26: 32 - 26 = 6 → 2^6 - 2 = 64 - 2 = 62 hosts
+    **✅ Example:**  
+    From /24 to /26 → Borrowed bits = 26 - 24 = 2 → Subnets = 2^2 = 4
 
 
-#### 🔹 **3. Total IPs per Subnet (including network + broadcast)**
+2. **Usable Hosts per Subnet**
 
-**🧾 Formula:**  
-Total IPs = 2^(32 - n)
+    **🧾 Formula:**  
+    Usable Hosts = 2^(32 - n) - 2
 
-**✅ Example:**  
-For /27: 2^(32 - 27) = 2^5 = 32 total IPs
+    **📌 Explanation:**
+    - `n` = CIDR  
+    - `32 - n` = number of host bits
 
-
-#### 🔹 **4. Subnet Increment (Block Size)**
-
-**🧾 Formula:**  
-Increment = 256 - value in subnet mask where subnetting happens
-
-**✅ Example:**  
-/26 = 255.255.255.192 → subnetting happens in 4th octet → 256 - 192 = 64
+    **✅ Example:**  
+    For /26: 32 - 26 = 6 → 2^6 - 2 = 64 - 2 = 62 hosts
 
 
-#### 🔹 **5. CIDR → Subnet Mask**
+3. **Total IPs per Subnet (including network + broadcast)**
 
-**🧾 Steps:**
-- Write `n` ones followed by `32 - n` zeros in binary
-- Break into 4 octets, convert to decimal
+    **🧾 Formula:**  
+    Total IPs = 2^(32 - n)
 
-**✅ Example:**  
-/26 → Binary: 11111111.11111111.11111111.11000000  
-→ Mask: 255.255.255.192
+    **✅ Example:**  
+    For /27: 2^(32 - 27) = 2^5 = 32 total IPs
 
 
-#### 🔹 **6. Subnet Mask → CIDR**
+4. **Subnet Increment (Block Size)**
 
-**🧾 Steps:**
-- Convert mask to binary  
-- Count the number of 1s = `n`
+    **🧾 Formula:**  
+    Increment = 256 - value in subnet mask where subnetting happens
 
-**✅ Example:**  
-255.255.255.224 → 27 ones → /27
-
-
-#### 🔹 **7. Wildcard Mask**
-
-**🧾 Formula:**  
-Wildcard Mask = 255.255.255.255 - Subnet Mask
-
-**✅ Example:**  
-255.255.255.0 → 0.0.0.255
+    **✅ Example:**  
+    /26 = 255.255.255.192 → subnetting happens in 4th octet → 256 - 192 = 64
 
 
-#### 🔹 **8. Network Address**
+5. **CIDR → Subnet Mask**
 
-**🧾 Formula:**  
-Network Address = IP Address AND Subnet Mask
+    **🧾 Steps:**
+    - Write `n` ones followed by `32 - n` zeros in binary
+    - Break into 4 octets, convert to decimal
 
-**✅ Example:**  
-192.168.1.130 AND 255.255.255.192 → Network: 192.168.1.128
-
-
-#### 🔹 **9. Broadcast Address**
-
-**🧾 Formula:**  
-Broadcast = Network Address + 2^(32 - n) - 1
-
-**✅ Example:**  
-Network: 192.168.1.128, /26 → 2^6 = 64 IPs  
-→ Broadcast = 192.168.1.128 + 63 = 192.168.1.191
+    **✅ Example:**  
+    /26 → Binary: 11111111.11111111.11111111.11000000  
+    → Mask: 255.255.255.192
 
 
-#### 🔹 **10. Host Range**
+6. **Subnet Mask → CIDR**
 
-**🧾 Formula:**  
-First Host = Network Address + 1  
-Last Host = Broadcast Address - 1
+    **🧾 Steps:**
+    - Convert mask to binary  
+    - Count the number of 1s = `n`
 
-**✅ Example:**  
-Network: 192.168.1.128  
-Broadcast: 192.168.1.191  
-→ Host range: 192.168.1.129 – 192.168.1.190
+    **✅ Example:**  
+    255.255.255.224 → 27 ones → /27
+
+
+7. **Wildcard Mask**
+
+    **🧾 Formula:**  
+    Wildcard Mask = 255.255.255.255 - Subnet Mask
+
+    **✅ Example:**  
+    255.255.255.0 → 0.0.0.255
+
+
+8. **Network Address**
+
+    **🧾 Formula:**  
+    Network Address = IP Address AND Subnet Mask
+
+    **✅ Example:**  
+    192.168.1.130 AND 255.255.255.192 → Network: 192.168.1.128
+
+
+9. **Broadcast Address**
+
+    **🧾 Formula:**  
+    Broadcast = Network Address + 2^(32 - n) - 1
+
+    **✅ Example:**  
+    Network: 192.168.1.128, /26 → 2^6 = 64 IPs  
+    → Broadcast = 192.168.1.128 + 63 = 192.168.1.191
+
+
+10. **Host Range**
+
+    **🧾 Formula:**  
+    First Host = Network Address + 1  
+    Last Host = Broadcast Address - 1
+
+    **✅ Example:**  
+    Network: 192.168.1.128  
+    Broadcast: 192.168.1.191  
+    → Host range: 192.168.1.129 – 192.168.1.190
 
 
 #### 📌 Final Summary Table (All in terms of `/n`)
@@ -212,7 +212,7 @@ R1 -- R2 -- R3 -- R4 -- R5
   -------< >-----------
 ```
 
-- Step 1 - Router Initialization
+- Step 1 - **Router Initialization**
     - Routers boots and starts RIP
     - Router adds it connected network ( Routers ) to its router DB
     - For example, 
@@ -222,7 +222,7 @@ R1 -- R2 -- R3 -- R4 -- R5
         - R1’s routing table at this point:
             - 10.0.12.0/30 — directly connected
             - 10.0.15.0/30 — directly connected
-- Step 2 - RIP sends routing updates 
+- Step 2 - **RIP sends routing updates**
     - Distance vector
     - Each router sends its full routing table to directly connected neighbors
         - Every 30 seconds
@@ -234,7 +234,7 @@ R1 -- R2 -- R3 -- R4 -- R5
         - 10.0.23.0/30 — metric 1
         - 10.0.12.0/30 — metric 0
 
-- Step 3 - R1 Receives Update from R2
+- Step 3 - **R1 Receives Update from R2**
     - R1 receives R2’s update
     - R1 adds R2’s networks to its routing table
         - 10.0.23.0/30 — metric 1
@@ -242,7 +242,7 @@ R1 -- R2 -- R3 -- R4 -- R5
     - R1 updates its routing table(Hop count)
         - 10.0.23.0/30 — metric 2 via R2
         - 10.0.12.0/30 — metric 1 `(R2–R3 link)`
-- Step 4 - Information Propagation
+- Step 4 - **Information Propagation**
     - R2 sends R3's networks to R1
     - R3's route (10.0.34.0/30) comes to R2
     - R2 updates its routing table
@@ -250,8 +250,8 @@ R1 -- R2 -- R3 -- R4 -- R5
         - R2 advertises to R1: 10.0.34.0/30 → 2 hops
     - R1 adds 1 hop: 10.0.34.0/30 → 3 hops via R2
         - R1 → R2 → R3 → R4 = 3 hops to R4’s network
-    
-- Step 5 - R1 Learns Multiple Paths
+
+- Step 5 - **R1 Learns Multiple Paths**
     - R1 also hears from R5
     - R1 receives R5’s update
         - 10.0.45.0/30 (R4–R5) via R5 → 2 hops
@@ -260,8 +260,8 @@ R1 -- R2 -- R3 -- R4 -- R5
         - R1 → R2 → R3 → R4 → 3 hops
         - R1 → R5 → R4 → 2 hops
 
-- Step 6 - Routing Table Convergence
-    
+- Step 6 - **Routing Table Convergence**
+
 | Destination  | Next Hop | Metric (Hop Count) |
 | ------------ | -------- | ------------------ |
 | 10.0.12.0/30 | Direct   | 0                  |
@@ -270,7 +270,7 @@ R1 -- R2 -- R3 -- R4 -- R5
 | 10.0.34.0/30 | R2 or R5 | 2 or 2             |
 | 10.0.45.0/30 | R5       | 1                  |
 
-- Step 7 - Periodic Updates
+- Step 7 - **Periodic Updates**
     - Every 30 seconds, all routers continue sending their full routing table to neighbors.
     - RIP automatically adjusts when a link goes down `(after 180 seconds → route is invalid)`. 
 
