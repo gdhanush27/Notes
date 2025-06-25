@@ -204,6 +204,165 @@ Broadcast: 192.168.1.191
 
 ---
 
+## RIP
+
+```markdown
+R1 -- R2 -- R3 -- R4 -- R5
+ |                     |
+  -------< >-----------
+```
+
+- Step 1 - Router Initialization
+    - Routers boots and starts RIP
+    - Router adds it connected network ( Routers ) to its router DB
+    - For example, 
+        - R1 has interfaces to:
+            - 10.0.12.0/30 (to R2)
+            -  10.0.15.0/30 (to R5)
+        - R1’s routing table at this point:
+            - 10.0.12.0/30 — directly connected
+            - 10.0.15.0/30 — directly connected
+- Step 2 - RIP sends routing updates 
+    - Distance vector
+    - Each router sends its full routing table to directly connected neighbors
+        - Every 30 seconds
+        - UDP port 520
+    - R1 sends to R2:
+        - 10.0.12.0/30 — metric 0
+        - 10.0.15.0/30 — metric 0
+    - R2 sends to R1:
+        - 10.0.23.0/30 — metric 1
+        - 10.0.12.0/30 — metric 0
+
+- Step 3 - R1 Receives Update from R2
+    - R1 receives R2’s update
+    - R1 adds R2’s networks to its routing table
+        - 10.0.23.0/30 — metric 1
+        - 10.0.12.0/30 — metric 0
+    - R1 updates its routing table(Hop count)
+        - 10.0.23.0/30 — metric 2 via R2
+        - 10.0.12.0/30 — metric 1 `(R2–R3 link)`
+- Step 4 - Information Propagation
+    - R2 sends R3's networks to R1
+    - R3's route (10.0.34.0/30) comes to R2
+    - R2 updates its routing table
+        - R3 advertised to R2: 10.0.34.0/30 → 1 hop
+        - R2 advertises to R1: 10.0.34.0/30 → 2 hops
+    - R1 adds 1 hop: 10.0.34.0/30 → 3 hops via R2
+        - R1 → R2 → R3 → R4 = 3 hops to R4’s network
+    
+- Step 5 - R1 Learns Multiple Paths
+    - R1 also hears from R5
+    - R1 receives R5’s update
+        - 10.0.45.0/30 (R4–R5) via R5 → 2 hops
+        - 10.0.34.0/30 (R3–R4) via R5 → 3 hops
+    - R1 has two paths to R4’s network
+        - R1 → R2 → R3 → R4 → 3 hops
+        - R1 → R5 → R4 → 2 hops
+
+- Step 6 - Routing Table Convergence
+    
+| Destination  | Next Hop | Metric (Hop Count) |
+| ------------ | -------- | ------------------ |
+| 10.0.12.0/30 | Direct   | 0                  |
+| 10.0.15.0/30 | Direct   | 0                  |
+| 10.0.23.0/30 | R2       | 1                  |
+| 10.0.34.0/30 | R2 or R5 | 2 or 2             |
+| 10.0.45.0/30 | R5       | 1                  |
+
+- Step 7 - Periodic Updates
+    - Every 30 seconds, all routers continue sending their full routing table to neighbors.
+    - RIP automatically adjusts when a link goes down `(after 180 seconds → route is invalid)`. 
+
+### Summary
+
+| Step | Action                                   | Effect on R1                          |
+| ---- | ---------------------------------------- | ------------------------------------- |
+| 1    | RIP starts, adds directly connected nets | Knows only its links                  |
+| 2    | Receives updates from R2 and R5          | Learns about R3, R4 via neighbors     |
+| 3    | Updates routing table with hop count     | Chooses shortest path to all routers  |
+| 4    | Receives better paths                    | Replaces entries with lower hop count |
+| 5    | Periodically sends and receives updates  | Maintains table continuously          |
+
+---
+
+## OSPF
+- Link State Protocol
+- Uses Dijkstra's algorithm to find the shortest path
+
+### OSPF Step-by-Step Workflow
+1. **Initialization**
+   - OSPF starts on each router.
+   - Each router identifies its directly connected interfaces and their states.
+
+2. **Hello Packets**
+    - Routers send Hello packets to discover neighbors.
+    - Hello packets contain information about the router's ID, priority, and other parameters.
+        ```
+        R1 ---- Hello ----> R2
+        R1 <--- Hello ---- R2  
+        ```
+3. **Establishing Adjacency**
+    - Routers form adjacency with certain neighbors (like DR/BDR on multi-access networks).
+
+    - Once adjacent, they start exchanging LSAs.
+
+4. **LSA Exchange (Database Synchronization)**
+    - Routers exchange Link-State Advertisements (LSAs) using Database Description (DBD) packets.
+
+    - Routers use LS Request, LS Update, LS Ack to synchronize their Link-State Databases (LSDBs).
+
+5. **LSA Types (Important for OSPF Operation)**
+
+    | LSA Type | Description                                                                   |
+    | -------- | ----------------------------------------------------------------------------- |
+    | Type 1   | **Router LSA** – Sent by each router within an area                           |
+    | Type 2   | **Network LSA** – Sent by DR in a broadcast network                           |
+    | Type 3   | **Summary LSA** – Sent by ABR to advertise routes between areas               |
+    | Type 4   | **ASBR Summary LSA** – Info about ASBR to other areas                         |
+    | Type 5   | **External LSA** – Routes to external networks (e.g., redistributed from BGP) |
+
+6. **SPF Calculation (Shortest Path First)**
+    - Each router builds a Link-State Database (LSDB).
+
+    - It runs the Dijkstra's SPF algorithm on the LSDB to calculate the shortest path to all other routers/networks.
+    
+    ```
+    SPF Tree (R1):
+    - R1 → R2 (cost 10)
+    - R1 → R3 (cost 20 via R2)
+    ```
+
+7. **Routing Table Formation**
+    - After SPF calculation, each router creates its routing table based on the shortest paths found.
+    
+    ```
+    Routing Table:
+    Network 10.0.0.0/24 via R2, cost 10
+    Network 192.168.1.0/24 via R3, cost 20
+    ```
+
+8. **Periodic and Triggered Updates**
+- OSPF does not send periodic full updates.
+- Only changes (like link down/up) trigger a new LSA.
+- LSAs are flooded to all OSPF routers within the area.
+
+### OSPF Summary Table
+
+| Step | Description                              |
+| ---- | ---------------------------------------- |
+| 1    | Routers initialize and assign OSPF areas |
+| 2    | Discover neighbors via Hello packets     |
+| 3    | Form adjacencies                         |
+| 4    | Exchange LSAs (DB sync)                  |
+| 5    | Build the LSDB with LSA types            |
+| 6    | Run SPF algorithm to find best paths     |
+| 7    | Install routes in the routing table      |
+| 8    | React to topology changes with new LSAs  |
+
+
+---
+
 ## STP ( Spanning Tree Protocol )
 
 - Layer 2 protocol 
@@ -277,8 +436,6 @@ Consider the below connection for STP:
 | SW3–SW4 | DP       | Blocked  | Loop prevented |
 | SW4–SW5 | RP       | DP       | Active         |
 
+
+
 ---
-
-
-Client server
-Application port
