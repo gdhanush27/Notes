@@ -377,54 +377,54 @@ Consider the below connection for STP:
    \_______________________/
 ```
 
-#### Find the Root Bridge
+1. Find the Root Bridge
 
-- Each switch has a priority and a MAC address
-- Select the lowest priority 
-- If some has the same priority, choose the switch with lowest MAC as Root Bridge
+    - Each switch has a priority and a MAC address
+    - Select the lowest priority 
+    - If some has the same priority, choose the switch with lowest MAC as Root Bridge
 
-| Switch | Priority | MAC Address       | Bridge ID (Priority.MAC) |
-| ------ | -------- | ----------------- | ------------------------ |
-| SW1    | 32768    | 00:11:22:33:44:01 | 32768.00:11:22:33:44:01  |
-| SW2    | 32768    | 00:11:22:33:44:02 | 32768.00:11:22:33:44:02  |
-| SW3    | 32768    | 00:11:22:33:44:03 | 32768.00:11:22:33:44:03  |
-| SW4    | 32768    | 00:11:22:33:44:04 | 32768.00:11:22:33:44:04  |
-| SW5    | 32768    | 00:11:22:33:44:05 | 32768.00:11:22:33:44:05  |
-
-
-#### Select the Root Port for Other Switchs
-
-- Find the best path to Root Bridge
-- assume all link are 1 Gbps = 4 cost
-
-| Switch | Path to Root    | Total Cost | Root Port |
-| ------ | --------------- | ---------- | --------- |
-| SW2    | SW2 → SW1       | 4          | SW2 → SW1 |
-| SW5    | SW5 → SW1       | 4          | SW5 → SW1 |
-| SW3    | SW3 → SW2 → SW1 | 8          | SW3 → SW2 |
-| SW4    | SW4 → SW5 → SW1 | 8          | SW4 → SW5 |
+    | Switch | Priority | MAC Address       | Bridge ID (Priority.MAC) |
+    | ------ | -------- | ----------------- | ------------------------ |
+    | SW1    | 32768    | 00:11:22:33:44:01 | 32768.00:11:22:33:44:01  |
+    | SW2    | 32768    | 00:11:22:33:44:02 | 32768.00:11:22:33:44:02  |
+    | SW3    | 32768    | 00:11:22:33:44:03 | 32768.00:11:22:33:44:03  |
+    | SW4    | 32768    | 00:11:22:33:44:04 | 32768.00:11:22:33:44:04  |
+    | SW5    | 32768    | 00:11:22:33:44:05 | 32768.00:11:22:33:44:05  |
 
 
-#### Designate Port to each Link
+2. Select the Root Port for Other Switchs
 
-- Root as DP ( eg, in two links SW1–SW2 and SW1–SW5 )
-- SW3–SW4	SW3 vs SW4? Tie → use MAC
-    - Both have equal cost (8)
-    - Compare MACs
-    - SW3 has lower MAC → becomes DP
+    - Find the best path to Root Bridge
+    - assume all link are 1 Gbps = 4 cost
 
-| Link    | DP Decision               |
-| ------- | ------------------------- |
-| SW1–SW2 | SW1 is Root → DP          |
-| SW1–SW5 | SW1 is Root → DP          |
-| SW2–SW3 | SW2 has lower cost → DP   |
-| SW3–SW4 | SW3 vs SW4? Tie → use MAC |
-| SW4–SW5 | SW5 has lower cost → DP   |
+    | Switch | Path to Root    | Total Cost | Root Port |
+    | ------ | --------------- | ---------- | --------- |
+    | SW2    | SW2 → SW1       | 4          | SW2 → SW1 |
+    | SW5    | SW5 → SW1       | 4          | SW5 → SW1 |
+    | SW3    | SW3 → SW2 → SW1 | 8          | SW3 → SW2 |
+    | SW4    | SW4 → SW5 → SW1 | 8          | SW4 → SW5 |
 
 
-#### Identify Blocked Ports
+3. Designate Port to each Link
 
-- Any port that is not a Root Port (RP) or Designated Port (DP) must be Blocked.
+    - Root as DP ( eg, in two links SW1–SW2 and SW1–SW5 )
+    - SW3–SW4	SW3 vs SW4? Tie → use MAC
+        - Both have equal cost (8)
+        - Compare MACs
+        - SW3 has lower MAC → becomes DP
+
+    | Link    | DP Decision               |
+    | ------- | ------------------------- |
+    | SW1–SW2 | SW1 is Root → DP          |
+    | SW1–SW5 | SW1 is Root → DP          |
+    | SW2–SW3 | SW2 has lower cost → DP   |
+    | SW3–SW4 | SW3 vs SW4? Tie → use MAC |
+    | SW4–SW5 | SW5 has lower cost → DP   |
+
+
+4. Identify Blocked Ports
+
+    - Any port that is not a Root Port (RP) or Designated Port (DP) must be Blocked.
 
 #### Final Summary
 
