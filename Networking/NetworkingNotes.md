@@ -3,13 +3,13 @@
 
 --- 
 
-## contains :
+## contains 
 - broadcast domain
 - Collision domain
 
 ---
 
-## Devices :
+## Devices 
 - Hub - does not break both domain
 - Switch - breaks only collision domain
 - Router - breaks both domain
