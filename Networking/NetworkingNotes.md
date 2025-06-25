@@ -426,7 +426,7 @@ Consider the below connection for STP:
 
     - Any port that is not a Root Port (RP) or Designated Port (DP) must be Blocked.
 
-#### Final Summary
+### Final Summary
 
 | Link    | SW1 Port | SW2 Port | STP Status     |
 | ------- | -------- | -------- | -------------- |
