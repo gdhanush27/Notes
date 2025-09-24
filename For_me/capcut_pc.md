@@ -47,6 +47,7 @@ This step-by-step guide explains how to export your CapCut videos with all pro f
 Your video will now be exported with all pro features intact and without any watermarks. You didn't need to pay for a subscription or use any cracked software.
 
 
-## Credits
+### Credits
 This method was shared by the original creator in the YouTube tutorial:  
+
 [How to Use CapCut Pro for FREE | Export With Pro Features](https://youtu.be/y8_i7Pl7I1Q)
