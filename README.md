@@ -15,3 +15,4 @@ A collection of tools and learning resources for:
 | **SQL Guide**         | Database fundamentals & best practices      | [Basics](./SQL-Notes/README.md)<br>[Normalization](./SQL-Notes/Normalization.md)<br>[Best Practices](./SQL-Notes/SQL_Best_Practices.md) |
 | **Accenture Notes**   | Notes for Accenture| [Quantitative](Accenture-Questions\Quans.md)<br>[Previous Questions](Accenture-Questions\Questions.md) |
 | **Telentio Hackerrank**| Solutions to Hackerrank problems (Telentio) | [Telentio Hackerrank Solutions](Telentio-hackerrank-problems\README.md) |
+| **Django Tutorial**| Django basics and workaround | [Django](Django-Tutorial) |
