@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Concepts: LLM, RAG, Agentic AI, and MCP Servers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1c;
+            --bg-secondary: #111827;
+            --accent-cyan: #22d3ee;
+            --accent-blue: #3b82f6;
+            --accent-violet: #8b5cf6;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #1e293b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow: hidden;
+            min-height: 100vh;
+        }
+
+        .slide-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            transform: translateX(50px);
+        }
+
+        .slide.active {
+            opacity: 1;
+            pointer-events: all;
+            transform: translateX(0);
+        }
+
+        .slide-content {
+            max-width: 1200px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 3rem;
+            background: linear-gradient(135deg, rgba(17, 24, 39, 0.9) 0%, rgba(10, 15, 28, 0.95) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 1.5rem;
+            position: relative;
+        }
+
+        .slide-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue), var(--accent-violet));
+            border-radius: 1.5rem 1.5rem 0 0;
+        }
+
+        .title-slide .slide-content {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(17, 24, 39, 0.95) 0%, rgba(30, 41, 59, 0.9) 100%);
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h2 {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--accent-cyan);
+        }
+
+        h3 {
+            font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+            font-weight: 500;
+            margin-bottom: 1rem;
+            color: var(--accent-blue);
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .meta-info {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 2rem;
+        }
+
+        ul {
+            list-style: none;
+            margin: 1rem 0;
+        }
+
+        ul li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
+            line-height: 1.6;
+        }
+
+        ul li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.5rem;
+            width: 6px;
+            height: 6px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+        }
+
+        .key-point {
+            background: linear-gradient(135deg, rgba(34, 211, 238, 0.1), rgba(59, 130, 246, 0.1));
+            border-left: 3px solid var(--accent-cyan);
+            padding: 1rem 1.25rem;
+            margin: 1rem 0;
+            border-radius: 0 0.5rem 0.5rem 0;
+        }
+
+        .diagram-box {
+            background: rgba(17, 24, 39, 0.8);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+
+        .diagram-placeholder {
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed var(--border-color);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .diagram-placeholder svg {
+            width: 64px;
+            height: 64px;
+            color: var(--accent-cyan);
+            margin-bottom: 1rem;
+            opacity: 0.7;
+        }
+
+        .diagram-placeholder span {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        td {
+            color: var(--text-secondary);
+        }
+
+        tr:hover td {
+            background: rgba(34, 211, 238, 0.05);
+        }
+
+        .speaker-notes {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 0.75rem;
+            padding: 1rem 1.25rem;
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: none;
+        }
+
+        .speaker-notes.visible {
+            display: block;
+        }
+
+        .speaker-notes::before {
+            content: 'Speaker Notes:';
+            display: block;
+            font-weight: 600;
+            color: var(--accent-violet);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Navigation */
+        .nav-controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            z-index: 100;
+            background: rgba(10, 15, 28, 0.9);
+            padding: 0.75rem 1.5rem;
+            border-radius: 2rem;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn {
+            width: 48px;
+            height: 48px;
+            border: none;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            color: var(--bg-primary);
+        }
+
+        .nav-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(34, 211, 238, 0.5);
+        }
+
+        .nav-btn:active {
+            transform: scale(0.95);
+        }
+
+        .nav-btn svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .progress-bar {
+            width: 120px;
+            height: 4px;
+            background: var(--border-color);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue));
+            transition: width 0.3s ease;
+        }
+
+        .slide-counter {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Additional Controls */
+        .top-controls {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            display: flex;
+            gap: 0.75rem;
+            z-index: 100;
+        }
+
+        .control-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(17, 24, 39, 0.9);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .control-btn:hover {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        .control-btn.active {
+            background: rgba(34, 211, 238, 0.2);
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        /* Background Effects */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(34, 211, 238, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(34, 211, 238, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .bg-glow {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(150px);
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.3;
+        }
+
+        .bg-glow-1 {
+            top: -200px;
+            right: -200px;
+            background: var(--accent-violet);
+        }
+
+        .bg-glow-2 {
+            bottom: -200px;
+            left: -200px;
+            background: var(--accent-cyan);
+        }
+
+        /* Flow Diagram Styles */
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin: 1.5rem 0;
+        }
+
+        .flow-box {
+            padding: 0.75rem 1.25rem;
+            background: linear-gradient(135deg, rgba(34, 211, 238, 0.15), rgba(59, 130, 246, 0.15));
+            border: 1px solid var(--accent-cyan);
+            border-radius: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .flow-arrow {
+            color: var(--accent-cyan);
+            font-size: 1.25rem;
+        }
+
+        /* Components Grid */
+        .components-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .component-card {
+            background: rgba(17, 24, 39, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            transition: all 0.3s;
+        }
+
+        .component-card:hover {
+            border-color: var(--accent-cyan);
+            transform: translateY(-2px);
+        }
+
+        .component-card h4 {
+            color: var(--accent-cyan);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .component-card p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        /* Steps */
+        .steps-list {
+            counter-reset: step;
+        }
+
+        .step-item {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: rgba(17, 24, 39, 0.5);
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .step-number {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--bg-primary);
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .step-content p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .slide-content {
+                padding: 1.5rem;
+                margin: 0.5rem;
+            }
+            
+            .nav-controls {
+                bottom: 1rem;
+                padding: 0.5rem 1rem;
+            }
+            
+            .nav-btn {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .progress-bar {
+                width: 80px;
+            }
+        }
+
+        /* Scrollbar */
+        .slide-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .slide-content::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+            border-radius: 3px;
+        }
+
+        .slide-content::-webkit-scrollbar-thumb {
+            background: var(--accent-cyan);
+            border-radius: 3px;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide.active .slide-content > * {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        .slide.active .slide-content > *:nth-child(1) { animation-delay: 0.1s; }
+        .slide.active .slide-content > *:nth-child(2) { animation-delay: 0.2s; }
+        .slide.active .slide-content > *:nth-child(3) { animation-delay: 0.3s; }
+        .slide.active .slide-content > *:nth-child(4) { animation-delay: 0.4s; }
+        .slide.active .slide-content > *:nth-child(5) { animation-delay: 0.5s; }
+        .slide.active .slide-content > *:nth-child(6) { animation-delay: 0.6s; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .slide {
+                transition: opacity 0.3s ease;
+                transform: none !important;
+            }
+            .slide.active .slide-content > * {
+                animation: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <div class="top-controls">
+        <button class="control-btn" id="notesToggle">Show Notes</button>
+        <button class="control-btn" id="overviewBtn">Overview</button>
+    </div>
+
+    <div class="slide-container" id="slideContainer">
+        <!-- Slide 1: Title -->
+        <div class="slide title-slide active" data-slide="1">
+            <div class="slide-content">
+                <h1>AI Concepts: LLM, RAG, Agentic AI, and MCP Servers</h1>
+                <p class="subtitle">Basics, Diagrams, Examples, and Creation Steps for Teaching</p>
+                <p class="meta-info">Presenter: [Your Name] | Date: February 22, 2026</p>
+                <div class="diagram-box" style="max-width: 400px; margin-top: 2rem;">
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Abstract AI Neural Networks Visual</p>
+                </div>
+                <div class="speaker-notes">Welcome the audience and outline the presentation's goal: to provide a reference for understanding and teaching these interconnected AI technologies.</div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Agenda -->
+        <div class="slide" data-slide="2">
+            <div class="slide-content">
+                <h2>Agenda / Overview</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1.5rem;">
+                    <div>
+                        <h3>Key Topics Covered</h3>
+                        <ul>
+                            <li><strong>Large Language Models (LLMs):</strong> Core reasoning engines</li>
+                            <li><strong>Retrieval-Augmented Generation (RAG):</strong> Enhancing accuracy with external data</li>
+                            <li><strong>Agentic AI:</strong> Autonomous systems for complex tasks</li>
+                            <li><strong>MCP Servers:</strong> Standardizing tool and data connections</li>
+                            <li><strong>Interconnections and Practical Insights</strong></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Why These Matter</h3>
+                        <p style="color: var(--text-secondary); line-height: 1.7;">They form the backbone of modern AI applications, addressing limitations like hallucinations and enabling scalable integrations.</p>
+                        <div class="key-point" style="margin-top: 1.5rem;">
+                            <strong>Total: 20 slides</strong> for comprehensive coverage without fatigue
+                        </div>
+                    </div>
+                </div>
+                <div class="speaker-notes">Highlight how these build on each other; mention potential challenges like computational demands.</div>
+            </div>
+        </div>
+
+        <!-- Slide 3: LLM Fundamentals -->
+        <div class="slide" data-slide="3">
+            <div class="slide-content">
+                <h2>LLM Fundamentals</h2>
+                <div class="key-point">
+                    <strong>Definition:</strong> Transformer-based neural networks trained on vast datasets for text understanding and generation.
+                </div>
+                <div class="components-grid">
+                    <div class="component-card">
+                        <h4>Strengths</h4>
+                        <p>Excel in translation, summarization, and code writing.</p>
+                    </div>
+                    <div class="component-card">
+                        <h4>Limitations</h4>
+                        <p>Probabilistic nature can lead to hallucinations without additional context.</p>
+                    </div>
+                    <div class="component-card">
+                        <h4>Scalability</h4>
+                        <p>Models like GPT-4 have trillions of parameters, enabling broad generalization.</p>
+                    </div>
+                </div>
+                <div class="speaker-notes">Explain transformers briefly; note open-source options like Llama for customization.</div>
+            </div>
+        </div>
+
+        <!-- Slide 4: LLM Architecture -->
+        <div class="slide" data-slide="4">
+            <div class="slide-content">
+                <h2>LLM Architecture Diagram</h2>
+                <h3>Core Components</h3>
+                <div class="components-grid">
+                    <div class="component-card">
+                        <h4>Embedding Layer</h4>
+                        <p>Converts tokens to vectors</p>
+                    </div>
+                    <div class="component-card">
+                        <h4>Self-Attention</h4>
+                        <p>Captures dependencies</p>
+                    </div>
+                    <div class="component-card">
+                        <h4>Feed-Forward Layers</h4>
+                        <p>Processes features</p>
+                    </div>
+                    <div class="component-card">
+                        <h4>Output</h4>
+                        <p>Token probability distributions</p>
+                    </div>
+                </div>
+                <div class="diagram-box">
+                    <div class="diagram-placeholder">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/>
+                            <path d="M9 3v18M15 3v18M3 9h18M3 15h18"/>
+                        </svg>
+                        <span>Flow from input sequences through attention blocks to output</span>
+                    </div>
+                </div>
+                <div class="speaker-notes">Use the diagram to illustrate how self-attention works; discuss why it's efficient for sequences.</div>
+            </div>
+        </div>
+
+        <!-- Slide 5: LLM Example -->
+        <div class="slide" data-slide="5">
+            <div class="slide-content">
+                <h2>LLM Example and Usage</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div>
+                        <h3>Simple Example</h3>
+                        <div class="diagram-box">
+                            <p style="color: var(--text-secondary);">Prompt: "The capital of France is..."</p>
+                            <p style="color: var(--accent-cyan); font-weight: 600;">Response: "Paris"</p>
+                        </div>
+                        <h3>Complex Example</h3>
+                        <div class="diagram-box">
+                            <p style="color: var(--text-secondary);">Prompt: "Write a short story about a robot learning empathy"</p>
+                            <p style="color: var(--accent-cyan);">Generates narrative</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>How to Use</h3>
+                        <ul>
+                            <li>Access via APIs (e.g., OpenAI)</li>
+                            <li>Prompt engineering: Refine inputs for better outputs</li>
+                            <li>Tune parameters like temperature for creativity</li>
+                            <li>Integration: Embed in chatbots or apps</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="speaker-notes">Demo a live example if possible; emphasize assuming good intent in queries.</div>
+            </div>
+        </div>
+
+        <!-- Slide 6: LLM Creation Steps -->
+        <div class="slide" data-slide="6">
+            <div class="slide-content">
+                <h2>LLM Creation Steps</h2>
+                <div class="steps-list">
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Choose Pre-trained Model</h4>
+                            <p>Select from Hugging Face or similar repositories</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Set Up Environment</h4>
+                            <p>Python environment, import via transformers library</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Fine-tune on Custom Data</h4>
+                            <p>Use Trainer API for domain-specific training</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Deploy</h4>
+                            <p>Use platforms like AWS SageMaker</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <h4>Test with Metrics</h4>
+                            <p>Evaluate using perplexity and other benchmarks</p>
+                        </div>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th>Description</th>
+                            <th>Example Models</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Embeddings</td>
+                            <td>Vector representations</td>
+                            <td>Word2Vec in GPT</td>
+                        </tr>
+                        <tr>
+                            <td>Self-Attention</td>
+                            <td>Weighs importance</td>
+                            <td>Multi-head in Transformers</td>
+                        </tr>
+                        <tr>
+                            <td>Feed-Forward</td>
+                            <td>Processes features</td>
+                            <td>Dense layers in BERT</td>
+                        </tr>
+                        <tr>
+                            <td>Output Layer</td>
+                            <td>Predicts tokens</td>
+                            <td>Softmax in Llama</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="speaker-notes">Stress that fine-tuning requires data; discuss ethical considerations.</div>
+            </div>
+        </div>
+
+        <!-- Slide 7: RAG Fundamentals -->
+        <div class="slide" data-slide="7">
+            <div class="slide-content">
+                <h2>RAG Fundamentals</h2>
+                <div class="key-point">
+                    <strong>Definition:</strong> Combines retrieval from knowledge bases with LLM generation for accurate responses.
+                </div>
+                <div class="components-grid">
+                    <div class="component-card">
+                        <h4>Benefits</h4>
+                        <p>Reduces hallucinations, supports up-to-date knowledge</p>
+                    </div>
+                    <div class="component-card">
+                        <h4>Challenges</h4>
+                        <p>Optimal chunk sizes, multimodal data handling</p>
+                    </div>
+                    <div class="component-card">
+                        <h4>Relation to Others</h4>
+                        <p>Provides knowledge for Agentic AI</p>
+                    </div>
+                </div>
+                <div class="speaker-notes">Note advanced variants like Agentic RAG; compare to plain LLMs.</div>
+            </div>
+        </div>
+
+        <!-- Slide 8: RAG Diagram -->
+        <div class="slide" data-slide="8">
+            <div class="slide-content">
+                <h2>RAG System Diagram</h2>
+                <div class="flow-diagram">
+                    <div class="flow-box">Data Ingestion</div>
+                    <span class="flow-arrow">→</span>
+                    <div class="flow-box">Embedding</div>
+                    <span class="flow-arrow">→</span>
+                    <div class="flow-box">Retrieval</div>
+                    <span class="flow-arrow">→</span>
+                    <div class="flow-box">Augmentation</div>
+                    <span class="flow-arrow">→</span>
+                    <div class="flow-box">Generation</div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1.5rem;">
+                    <div>
+                        <h3>Key Elements</h3>
+                        <ul>
+                            <li><strong>Vector DB:</strong> FAISS, Pinecone, Chroma</li>
+                            <li><strong>Embeddings:</strong> Sentence Transformers</li>
+                            <li><strong>Retriever:</strong> Semantic search</li>
+                        </ul>
+                    </div>
+                    <div class="diagram-box">
+                        <div class="diagram-placeholder">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"/>
+                                <path d="M21 21l-4.35-4.35"/>
+                            </svg>
+                            <span>Query embedding, search, and LLM integration</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="speaker-notes">Walk through the flow; explain why retrieval improves factual accuracy.</div>
+            </div>
+        </div>
+
+        <!-- Slide 9: RAG Example -->
+        <div class="slide" data-slide="9">
+            <div class="slide-content">
+                <h2>RAG Example and Usage</h2>
+                <div class="diagram-box">
+                    <h3>Example Query Flow</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 0.5rem;">Query: "Refund policy?"</p>
+                    <p style="color: var(--accent-cyan);">→ Retrieves relevant documents → Generates cited response</p>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1.5rem;">
+                    <div>
+                        <h3>How to Use</h3>
+                        <ul>
+                            <li>Input query; system retrieves and augments</li>
+                            <li>Maintenance: Update knowledge base regularly</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Use Cases</h3>
+                        <ul>
+                            <li>Enterprise HR systems</li>
+                            <li>Legal document search</li>
+                            <li>Customer support</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="speaker-notes">Ideal for enterprise use like HR or legal; discuss quality dependencies.</div>
+            </div>
+        </div>
+
+        <!-- Slide 10: RAG Creation Steps -->
+        <div class="slide" data-slide="10">
+            <div class="slide-content">
+                <h2>RAG Creation Steps</h2>
+                <div class="steps-list">
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Gather Data</h4>
+                            <p>Collect PDFs, documents, web content</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Build Vector DB</h4>
+                            <p>Use FAISS, Pinecone, or Chroma</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Set Up Retriever</h4>
+                            <p>Configure semantic search parameters</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Integrate LLM</h4>
+                            <p>Use frameworks like LangChain</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <h4>Deploy and Evaluate</h4>
+                            <p>Measure recall/precision metrics</p>
+                        </div>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Stage</th>
+                            <th>Tools</th>
+                            <th>Issues</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Ingestion</td>
+                            <td>Unstructured.io</td>
+                            <td>Noise</td>
+                        </tr>
+                        <tr>
+                            <td>Embedding</td>
+                            <td>Hugging Face</td>
+                            <td>Semantic gaps</td>
+                        </tr>
+                        <tr>
+                            <td>Retrieval</td>
+                            <td>FAISS</td>
+                            <td>Latency</td>
+                        </tr>
+                        <tr>
+                            <td>Generation</td>
+                            <td>LangChain</td>
+                            <td>Context overflow</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="speaker-notes">Recommend starting small; integrate with MCP for tools.</div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Agentic AI Fundamentals -->
+        <div class="slide" data-slide="11">
+            <div class="slide-content">
+                <h2>Agentic AI Fundamentals</h2>
+                <div class="key-point">
+                    <strong>Definition:</strong> Autonomous agents using LLMs for reasoning, planning, and execution.
+                </div>
+                <div class="components-grid">
+                    <div class="component-card">
+                        <h4>Features</h4>
+                        <p>Loops like ReAct; memory for context</p>
+                    </div>
+                    <div class="component-card">
+                        <h4>Challenges</h4>
+                        <p>Error propagation, safety in actions</p>
+                    </div>
+                    <div class="component-card">
+                        <h4>Relation</h4>
+                        <p>Builds on LLMs/RAG; uses MCP for tools</p>
+                    </div>
+                </div>
+                <div class="speaker-notes">Emphasize shift from passive to active AI; multi-agent potential.</div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Agentic AI Diagram -->
+        <div class="slide" data-slide="12">
+            <div class="slide-content">
+                <h2>Agentic AI Workflow Diagram</h2>
+                <div class="flow-diagram">
+                    <div class="flow-box">Planning</div>
+                    <span class="flow-arrow">→</span>
+                    <div class="flow-box">Tool Execution</div>
+                    <span class="flow-arrow">→</span>
+                    <div class="flow-box">Reflection</div>
+                </div>
+                <div class="diagram-box">
+                    <h3>Cycle Process</h3>
+                    <p style="color: var(--text-secondary);">User Query → Plan → Execute → Observe → Reflect → Adapt</p>
+                    <div class="diagram-placeholder">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                        </svg>
+                        <span>User query to plan-execute-reflect loop</span>
+                    </div>
+                </div>
+                <div class="speaker-notes">Illustrate with a travel booking scenario.</div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Agentic AI Example -->
+        <div class="slide" data-slide="13">
+            <div class="slide-content">
+                <h2>Agentic AI Example and Usage</h2>
+                <div class="diagram-box">
+                    <h3>Example: Travel Planning Agent</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 0.5rem;">Goal: "Plan trip to Paris"</p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;">
+                        <span class="flow-box">Check Flights</span>
+                        <span class="flow-box">Book Hotel</span>
+                        <span class="flow-box">Create Itinerary</span>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1.5rem;">
+                    <div>
+                        <h3>How to Use</h3>
+                        <ul>
+                            <li>Provide goal; agent executes autonomously</li>
+                            <li>Monitor: Review decision logs</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Frameworks</h3>
+                        <ul>
+                            <li>CrewAI for multi-agents</li>
+                            <li>LangGraph for workflows</li>
+                            <li>AutoGen for collaboration</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="speaker-notes">Frameworks like CrewAI for multi-agents; real-world automation.</div>
+            </div>
+        </div>
+
+        <!-- Slide 14: Agentic AI Creation Steps -->
+        <div class="slide" data-slide="14">
+            <div class="slide-content">
+                <h2>Agentic AI Creation Steps</h2>
+                <div class="steps-list">
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Select Framework</h4>
+                            <p>LangGraph, CrewAI, or AutoGen</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Define Tools</h4>
+                            <p>APIs, databases, external services</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Build Agent with LLM Reasoner</h4>
+                            <p>Configure planning and execution logic</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Add Memory</h4>
+                            <p>Use Redis or Vector DBs for context</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <h4>Deploy and Test</h4>
+                            <p>Monitor performance and safety</p>
+                        </div>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th>Role</th>
+                            <th>Frameworks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Reasoning</td>
+                            <td>Plans</td>
+                            <td>GPT/Claude</td>
+                        </tr>
+                        <tr>
+                            <td>Tools</td>
+                            <td>Executes</td>
+                            <td>Custom APIs</td>
+                        </tr>
+                        <tr>
+                            <td>Memory</td>
+                            <td>Context</td>
+                            <td>Vector DBs</td>
+                        </tr>
+                        <tr>
+                            <td>Orchestrator</td>
+                            <td>Flow</td>
+                            <td>LangGraph</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="speaker-notes">Focus on orchestration for complex workflows.</div>
+            </div>
+        </div>
+
+        <!-- Slide 15: MCP Fundamentals -->
+        <div class="slide" data-slide="15">
+            <div class="slide-content">
+                <h2>MCP Servers Fundamentals</h2>
+                <div class="key-point">
+                    <strong>Definition:</strong> Open standard for connecting AI to tools/data securely.
+                </div>
+                <div class="components-grid">
+                    <div class="component-card">
+                        <h4>Features</h4>
+                        <p>Discovery manifests, authentication, read/write ops</p>
+                    </div>
+                    <div class="component-card">
+                        <h4>Benefits</h4>
+                        <p>Simplifies integrations, supports sessions</p>
+                    </div>
+                    <div class="component-card">
+                        <h4>Relation</h4>
+                        <p>Enables RAG/Agentic scalability</p>
+                    </div>
+                </div>
+                <div class="speaker-notes">From Anthropic; growing adoption for governance.</div>
+            </div>
+        </div>
+
+        <!-- Slide 16: MCP Architecture -->
+        <div class="slide" data-slide="16">
+            <div class="slide-content">
+                <h2>MCP Architecture Diagram</h2>
+                <div class="flow-diagram">
+                    <div class="flow-box">Clients (AI Apps)</div>
+                    <span class="flow-arrow">↔</span>
+                    <div class="flow-box">Servers (Tools)</div>
+                    <span class="flow-arrow">↔</span>
+                    <div class="flow-box">External Systems</div>
+                </div>
+                <div class="diagram-box">
+                    <h3>Flow Description</h3>
+                    <p style="color: var(--text-secondary);">Requests via protocol for actions/data</p>
+                    <div class="diagram-placeholder">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="3" width="20" height="14" rx="2"/>
+                            <path d="M8 21h8M12 17v4"/>
+                        </svg>
+                        <span>MCP hosts/clients to servers interfacing tools</span>
+                    </div>
+                </div>
+                <div class="speaker-notes">Highlight bi-directional, secure nature.</div>
+            </div>
+        </div>
+
+        <!-- Slide 17: MCP Example -->
+        <div class="slide" data-slide="17">
+            <div class="slide-content">
+                <h2>MCP Example and Usage</h2>
+                <div class="diagram-box">
+                    <h3>Example: GitHub Integration</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 0.5rem;">LLM connects to GitHub for code retrieval</p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;">
+                        <span class="flow-box">Register Server</span>
+                        <span class="flow-box">Invoke Protocol</span>
+                        <span class="flow-box">Secure OAuth</span>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1.5rem;">
+                    <div>
+                        <h3>How to Use</h3>
+                        <ul>
+                            <li>Register server with manifest</li>
+                            <li>Invoke via protocol</li>
+                            <li>Secure with OAuth</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Integrations</h3>
+                        <ul>
+                            <li>Tableau for analytics</li>
+                            <li>Brave for search</li>
+                            <li>Custom databases</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="speaker-notes">Complements agents; examples from Tableau/Brave.</div>
+            </div>
+        </div>
+
+        <!-- Slide 18: MCP Creation Steps -->
+        <div class="slide" data-slide="18">
+            <div class="slide-content">
+                <h2>MCP Creation Steps</h2>
+                <div class="steps-list">
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Review Spec</h4>
+                            <p>Visit modelcontextprotocol.io</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Set Up Framework</h4>
+                            <p>Use FastAPI or similar frameworks</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Define Endpoints</h4>
+                            <p>/manifest, /invoke, and other routes</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Integrate Tools</h4>
+                            <p>Connect databases, APIs, services</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <h4>Deploy with Auth</h4>
+                            <p>Implement OAuth/JWT authentication</p>
+                        </div>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Element</th>
+                            <th>Function</th>
+                            <th>Tips</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Manifest</td>
+                            <td>Describes tools</td>
+                            <td>JSON schema</td>
+                        </tr>
+                        <tr>
+                            <td>Client</td>
+                            <td>Requests</td>
+                            <td>In LLMs like Claude</td>
+                        </tr>
+                        <tr>
+                            <td>Server</td>
+                            <td>Logic</td>
+                            <td>Dockerize</td>
+                        </tr>
+                        <tr>
+                            <td>Governance</td>
+                            <td>Security</td>
+                            <td>JWT/RBAC</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="speaker-notes">Emphasize standardization over custom code.</div>
+            </div>
+        </div>
+
+        <!-- Slide 19: Interconnections -->
+        <div class="slide" data-slide="19">
+            <div class="slide-content">
+                <h2>Interconnections and Key Insights</h2>
+                <div class="key-point">
+                    <strong>How They Link:</strong> LLMs power all; RAG feeds Agentic; MCP connects externally.
+                </div>
+                <div class="flow-diagram" style="margin: 1.5rem 0;">
+                    <div class="flow-box" style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(59, 130, 246, 0.3)); border-color: var(--accent-violet);">LLM</div>
+                    <span class="flow-arrow">→</span>
+                    <div class="flow-box">RAG</div>
+                    <span class="flow-arrow">→</span>
+                    <div class="flow-box" style="background: linear-gradient(135deg, rgba(34, 211, 238, 0.3), rgba(16, 185, 129, 0.3)); border-color: #10b981;">Agentic AI</div>
+                    <span class="flow-arrow">↔</span>
+                    <div class="flow-box">MCP</div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div>
+                        <h3>Insights</h3>
+                        <ul>
+                            <li>Mitigate hallucinations</li>
+                            <li>Enable autonomy</li>
+                            <li>Standardize access</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Challenges</h3>
+                        <ul>
+                            <li>Compute costs</li>
+                            <li>Ethical use</li>
+                            <li>Adoption curves</li>
+                        </ul>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Concept</th>
+                            <th>Strengths</th>
+                            <th>Limitations</th>
+                            <th>Tools</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>LLM</td>
+                            <td>Generalization</td>
+                            <td>Hallucinations</td>
+                            <td>Hugging Face</td>
+                        </tr>
+                        <tr>
+                            <td>RAG</td>
+                            <td>Accuracy</td>
+                            <td>DB Quality</td>
+                            <td>LangChain</td>
+                        </tr>
+                        <tr>
+                            <td>Agentic AI</td>
+                            <td>Autonomy</td>
+                            <td>Errors</td>
+                            <td>CrewAI</td>
+                        </tr>
+                        <tr>
+                            <td>MCP</td>
+                            <td>Integration</td>
+                            <td>Emerging</td>
+                            <td>FastAPI</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="speaker-notes">Discuss synergies; encourage Q&A on applications.</div>
+            </div>
+        </div>
+
+        <!-- Slide 20: Conclusion -->
+        <div class="slide title-slide" data-slide="20">
+            <div class="slide-content">
+                <h2>Conclusion and Q&A</h2>
+                <div class="key-point" style="text-align: center;">
+                    <strong>Summary:</strong> These technologies evolve AI from static to dynamic systems.
+                </div>
+                <div class="key-point" style="text-align: center; margin-top: 1.5rem;">
+                    <strong>Call to Action:</strong> Experiment with open-source tools for hands-on learning.
+                </div>
+                <div style="margin-top: 3rem;">
+                    <h3 style="text-align: center;">Thank You!</h3>
+                    <p style="text-align: center; color: var(--text-secondary); margin-top: 1rem;">Questions and Discussion</p>
+                </div>
+                <div class="speaker-notes">Recap key points; open for questions.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" id="prevBtn" aria-label="Previous slide">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M15 18l-6-6 6-6"/>
+            </svg>
+        </button>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <span class="slide-counter"><span id="currentSlide">1</span> / <span id="totalSlides">20</span></span>
+        <button class="nav-btn" id="nextBtn" aria-label="Next slide">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 18l6-6-6-6"/>
+            </svg>
+        </button>
+    </div>
+
+    <script>
+        // Initialize variables first
+        const totalSlides = 20;
+        let currentSlideNum = 1;
+        let notesVisible = false;
+
+        // Get DOM elements after they're available
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const progressFill = document.getElementById('progressFill');
+        const currentSlideEl = document.getElementById('currentSlide');
+        const totalSlidesEl = document.getElementById('totalSlides');
+        const notesToggle = document.getElementById('notesToggle');
+        const overviewBtn = document.getElementById('overviewBtn');
+
+        // Set initial values
+        totalSlidesEl.textContent = totalSlides;
+        updateProgress();
+
+        function goToSlide(n) {
+            if (n < 1) n = 1;
+            if (n > totalSlides) n = totalSlides;
+            
+            currentSlideNum = n;
+            
+            slides.forEach((slide, index) => {
+                if (index + 1 === n) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+            
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const percentage = Math.max(0, Math.min(100, (currentSlideNum / totalSlides) * 100));
+            progressFill.style.width = percentage + '%';
+            currentSlideEl.textContent = currentSlideNum;
+        }
+
+        function nextSlide() {
+            if (currentSlideNum < totalSlides) {
+                goToSlide(currentSlideNum + 1);
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlideNum > 1) {
+                goToSlide(currentSlideNum - 1);
+            }
+        }
+
+        // Event Listeners
+        prevBtn.addEventListener('click', prevSlide);
+        nextBtn.addEventListener('click', nextSlide);
+
+        notesToggle.addEventListener('click', function() {
+            notesVisible = !notesVisible;
+            document.querySelectorAll('.speaker-notes').forEach(note => {
+                note.classList.toggle('visible', notesVisible);
+            });
+            this.textContent = notesVisible ? 'Hide Notes' : 'Show Notes';
+            this.classList.toggle('active', notesVisible);
+        });
+
+        overviewBtn.addEventListener('click', function() {
+            goToSlide(2);
+        });
+
+        // Keyboard Navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevSlide();
+            } else if (e.key === 'Home') {
+                e.preventDefault();
+                goToSlide(1);
+            } else if (e.key === 'End') {
+                e.preventDefault();
+                goToSlide(totalSlides);
+            }
+        });
+
+        // Touch/Swipe Support
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+        }, false);
+
+        document.addEventListener('touchend', function(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, false);
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+            
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    nextSlide();
+                } else {
+                    prevSlide();
+                }
+            }
+        }
+
+        // Initialize first slide
+        goToSlide(1);
+    </script>
+</body>
+</html>
