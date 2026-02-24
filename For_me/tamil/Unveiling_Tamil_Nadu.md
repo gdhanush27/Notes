@@ -33,7 +33,7 @@ Hindu pride in Tamil Nadu is nuanced, often suppressed by atheist-leaning educat
 ## Education, Politics, and Generational Shifts
 
 Education in Tamil Nadu is highly valued, with a focus on job-oriented learning over entrepreneurship. Post-1950s reforms under K. Kamaraj boosted literacy from 7% to 37% in a decade, emphasizing rural access. Villages show remarkable political awareness, with residents avidly following "political dramas" via media. Politics remains engaging, tied to cinema and local issues.
-![alt text](assets/Unveiling_Tamil_Nadu/image-3.png) ![alt text](assets/Unveiling_Tamil_Nadu/image-4.png)
+
 Gen Z in Tamil Nadu blends tradition with modernity: high IQ/EQ, emotionally sensitive, but grappling with mental health from social media. Parental control is strict, prioritizing discipline and ethics. Business outlooks undervalue entrepreneurship, favoring white-collar stability and humility, though family businesses persist without the North's celebratory flair.
 
 ## Cinema: Stardom, Politics, and Cultural Mirror
@@ -49,7 +49,8 @@ Tamil cinema, or Kollywood, is a powerhouse of superstardom and political influe
 
 The cinema-politics nexus is unique to Tamil Nadu. Dravidian leaders like C.N. Annadurai and M. Karunanidhi used films for propaganda, embedding social justice themes. Stars like M.G. Ramachandran (MGR) transitioned to chief ministership via AIADMK, leveraging screen images of the oppressed's savior. Politicians often control releases, creating a cycle where actors enter politics (e.g., J. Jayalalithaa, Vijay). This interplay continues, though less dominantly, with films like *Jana Nayagan* sparking controversies.
 
-
+![alt text](assets/Unveiling_Tamil_Nadu/image-3.png) 
+![alt text](assets/Unveiling_Tamil_Nadu/image-4.png)
 
 
 | Aspect | Rajinikanth | Kamal Haasan |
