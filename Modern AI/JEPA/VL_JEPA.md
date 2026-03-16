@@ -1,3 +1,5 @@
+[https://htmldrop.pythonanywhere.com/d/5bc7f434d8](https://htmldrop.pythonanywhere.com/d/5bc7f434d8)
+
 ### 1. The Basics: What Are Tokens in LLMs?
 
 ![alt text](../../Images/JEPA/image.png)
