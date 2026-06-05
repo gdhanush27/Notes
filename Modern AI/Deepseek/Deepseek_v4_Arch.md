@@ -268,6 +268,84 @@ For example:
 This is one of the main reasons the model can scale capacity while remaining computationally practical.
 
 ---
+## 4. Infrastructure
+
+### Why infrastructure matters
+
+DeepSeek-V4 is too large to fit on a single GPU, so the model must be split across multiple GPUs or even multiple racks.
+
+In practice this means:
+
+- The model is too big to load on a single GPU, so it has to live on multiple GPUs or racks.
+- Each GPU holds only some layers of the model.
+- There is some latency in each stage, and GPUs end up waiting for one another to finish.
+
+For an MoE model, each token also has to be **dispatched** to the GPUs that hold the chosen experts, and the expert outputs have to be **combined** back. These dispatch and combine steps involve cross-GPU communication, which can dominate runtime if not overlapped with computation.
+
+A single MoE step can be broken down into four parts:
+
+- DISPATCH: send tokens to the GPUs that own the selected experts.
+- LAYER 1 / LAYER 2: the expert feed-forward computation, with an activation (ACT) in between.
+- COMBINE: gather expert outputs back to the source GPU.
+
+The paper compares three ways of scheduling these parts.
+
+### Normal approach
+
+In the normal approach, everything happens sequentially on the critical path:
+
+<img width="784" height="280" alt="image" src="https://github.com/user-attachments/assets/f37ac724-9ee2-46a2-8f59-9ee2e1786f10" />
+
+
+While DISPATCH runs, the compute units are idle. While LAYER 1 and LAYER 2 run, the network is idle. While COMBINE runs, compute is idle again.
+
+In simple words:
+
+> Communication and computation take turns, so the GPU is never fully busy.
+
+### Comet approach
+
+The Comet approach overlaps communication with computation. DISPATCH and COMBINE are run as separate streams that can happen in parallel with the LAYER 1 / ACT / LAYER 2 compute path.
+
+Layout:
+
+<img width="518" height="280" alt="image" src="https://github.com/user-attachments/assets/27f70736-3fde-4d76-a5ac-175829280832" />
+
+
+This hides part of the communication cost behind compute, but the overlap is coarse: one full DISPATCH overlaps with one full LAYER block, and one full COMBINE overlaps with the next.
+
+### DeepSeek-V4 approach
+
+DeepSeek-V4 takes the overlap idea further by **chunking** the work and interleaving DISPATCH, compute, ACT, and COMBINE at a finer granularity.
+
+Layout:
+
+<img width="1306" height="339" alt="image" src="https://github.com/user-attachments/assets/f229ed6c-ecbb-49d0-95f9-8a17774ed835" />
+
+
+Key ideas:
+
+- A single DISPATCH feeds **several** LAYER 1 / LAYER 2 micro-blocks.
+- ACT and COMBINE are interleaved with the next compute micro-block.
+- While one chunk is computing, the previous chunk’s COMBINE and the next chunk’s ACT can run in parallel.
+
+The effect is that GPUs spend much less time waiting. Communication for one chunk is hidden behind computation of another chunk, and the pipeline stays full.
+
+### Why the hybrid schedule is useful
+
+| Approach | Communication and compute overlap | GPU utilization |
+|---|---|---|
+| Normal | None, fully sequential | Low |
+| Comet | Coarse, one DISPATCH / COMBINE overlapped with one LAYER block | Medium |
+| DeepSeek-V4 | Fine-grained, chunked DISPATCH / ACT / COMBINE interleaved with compute | High |
+
+In simple words:
+
+> DeepSeek-V4 breaks the MoE step into smaller pieces and pipelines them, so dispatch, compute, and combine are happening at the same time on different chunks.
+
+This is what makes very large MoE models with hundreds of experts and trillions of total parameters practical to run at scale.
+
+---
 
 ## Short Summary
 
@@ -276,5 +354,6 @@ This is one of the main reasons the model can scale capacity while remaining com
 | Attention mechanism | Chooses what previous tokens to look at | Hybrid CSA + HCA + sliding window attention |
 | mHC | Stable enhanced residual connections | Widened residual stream with constrained doubly stochastic mixing |
 | Routed MoEs | Selects a few experts per token | DeepSeekMoE with many routed experts, one shared expert, and 6 routed experts active per token |
+| Infrastructure | Schedules dispatch/compute/combine across GPUs | Chunked, fine-grained interleaving of DISPATCH, LAYER 1/2, ACT, and COMBINE |
 
-DeepSeek-V4’s main design pattern is efficient scaling: compress what is too large, route only to what is needed, and constrain what may become unstable.
+DeepSeek-V4’s main design pattern is efficient scaling: compress what is too large, route only to what is needed, constrain what may become unstable, and pipeline what would otherwise wait.
